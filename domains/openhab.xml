@@ -17,7 +17,7 @@
   <!--=======================================================================-->
   <metadata>
     <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
-      <libosinfo:os id="http://freebsd.org/freebsd/12.1"/>
+      <libosinfo:os id="http://debian.org/debian/10"/>
     </libosinfo:libosinfo>
   </metadata>
   <os>
@@ -42,10 +42,10 @@
   <vcpu placement='static'>4</vcpu>
   <cpu mode='host-model' check='partial'>
     <model fallback='allow'/>
-    <topology sockets='1' cores='4' threads='1'/>
+    <topology sockets='1' cores='2' threads='1'/>
   </cpu>
-  <memory unit='KiB'>8388608</memory>
-  <currentMemory unit='KiB'>8388608</currentMemory>
+  <memory unit='KiB'>4194304</memory>
+  <currentMemory unit='KiB'>2097152</currentMemory>
   <!--=======================================================================-->
   <!-- Power Management                                                      -->
   <!--=======================================================================-->
@@ -68,12 +68,8 @@
   <!--   .00 - Virtio Random Number Generator                                -->
   <!--   .01 - Virtio Memory Balloon                                         -->
   <!-- 03.00 Virtio Network Card                                             -->
-  <!-- 04.xx Virtio Disk Drives                                              -->
-  <!--   .00 - OS Root/Boot Disk                                             -->
-  <!--   .01 - Storage Disk                                                  -->
-  <!--   .02 - Storage Disk                                                  -->
-  <!-- 05:00 Emulated GPU                                                    -->
-  <!-- 06-30 Unused Slots                                                    -->
+  <!-- 04:00 Emulated GPU                                                    -->
+  <!-- 05-30 Unused Slots                                                    -->
   <!-- 31.xx QEMU Hard-coded Devices                                         -->
   <!--   .00 - ISA Bridge                                                    -->
   <!--   .02 - Primary SATA Controller                                       -->
@@ -130,23 +126,10 @@
       <driver name='qemu' type='raw' cache='none' io='native'/>
       <source dev='/dev/mapper/vg0-nas-boot'/>
       <target dev='vda' bus='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0' multifunction='on'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
-      <source dev='/dev/mapper/vg0-nas-disk0'/>
-      <target dev='vdb' bus='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x1'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
-      <source dev='/dev/mapper/vg0-nas-disk1'/>
-      <target dev='vdc' bus='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x2'/>
     </disk>
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <source file='/mnt/data/images/iso/TrueNAS-12.0-U1.1.iso'/>
+      <source file='/mnt/data/images/iso/debian-10.7.0-amd64-netinst.iso'/>
       <readonly/>
       <target dev='sda' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
@@ -160,7 +143,7 @@
     <!--=====================================================================-->
     <video>
       <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
     </video>
     <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0' sharePolicy='allow-exclusive'>
       <listen type='address' address='0.0.0.0'/>
@@ -170,13 +153,7 @@
     <!-- * 1058:0810 => USB External Hard Drive                              -->
     <!-- * These devices are connected to the XHCI USB Controller above.     -->
     <!--=====================================================================-->
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x1058'/>
-        <product id='0x0810'/>
-      </source>
-      <address type='usb' bus='0' port='1'/>
-    </hostdev>
+    <!-- None -->
     <!--=====================================================================-->
     <!-- Serial Console                                                      -->
     <!-- * For redirecting Guest grub/kernel boot output to a serial console.-->
