@@ -38,6 +38,8 @@
   </clock>
   <!--=======================================================================-->
   <!-- CPU and Memory                                                        -->
+  <!-- * CPU => A single quad-core processor with same attrs as Host CPU.    -->
+  <!-- * Memory => 4GB RAM, allowed to dynamically grow to 8GB.              -->
   <!--=======================================================================-->
   <vcpu placement='static'>4</vcpu>
   <cpu mode='host-model' check='partial'>
@@ -45,7 +47,7 @@
     <topology sockets='1' cores='4' threads='1'/>
   </cpu>
   <memory unit='KiB'>8388608</memory>
-  <currentMemory unit='KiB'>8388608</currentMemory>
+  <currentMemory unit='KiB'>4194304</currentMemory>
   <!--=======================================================================-->
   <!-- Power Management                                                      -->
   <!--=======================================================================-->
@@ -206,7 +208,5 @@
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
-    <input type='mouse' bus='ps2'/>
-    <input type='keyboard' bus='ps2'/>
   </devices>
 </domain>

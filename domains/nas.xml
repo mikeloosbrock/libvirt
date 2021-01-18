@@ -38,6 +38,8 @@
   </clock>
   <!--=======================================================================-->
   <!-- CPU and Memory                                                        -->
+  <!-- * CPU => A single quad-core processor with same attrs as Host CPU.    -->
+  <!-- * Memory => Exactly 8GB RAM.                                          -->
   <!--=======================================================================-->
   <vcpu placement='static'>4</vcpu>
   <cpu mode='host-model' check='partial'>

@@ -38,8 +38,10 @@
   </clock>
   <!--=======================================================================-->
   <!-- CPU and Memory                                                        -->
+  <!-- * CPU => A single dual-core processor with same attrs as Host CPU.    -->
+  <!-- * Memory => 2GB RAM, allowed to dynamically grow to 4GB.              -->
   <!--=======================================================================-->
-  <vcpu placement='static'>4</vcpu>
+  <vcpu placement='static'>2</vcpu>
   <cpu mode='host-model' check='partial'>
     <model fallback='allow'/>
     <topology sockets='1' cores='2' threads='1'/>
