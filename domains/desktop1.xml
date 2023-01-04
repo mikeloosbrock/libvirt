@@ -18,7 +18,7 @@
   <!--=======================================================================-->
   <metadata>
     <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
-      <libosinfo:os id="http://ubuntu.com/ubuntu/20.04"/>
+      <libosinfo:os id="http://microsoft.com/win/11"/>
     </libosinfo:libosinfo>
   </metadata>
   <os>
@@ -97,7 +97,7 @@
     </controller>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x0a' slot='0x00' function='0x3' />
+	<address domain='0x0000' bus='0x05' slot='0x00' function='0x0' />
       </source>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
     </hostdev>
@@ -143,10 +143,24 @@
     </disk>
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <source file='/mnt/data/images/iso/ubuntu-20.04.3-live-server-amd64.iso'/>
+      <source file='/mnt/data/images/iso/Win11_22H2_English_x64v1.iso'/>
       <readonly/>
       <target dev='sda' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/mnt/data/images/iso/virtio-win-0.1.225.iso'/>
+      <readonly/>
+      <target dev='sdb' bus='sata'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/mnt/data/images/iso/amd-rx560-driver-22.11.2-win11.iso'/>
+      <readonly/>
+      <target dev='sdc' bus='sata'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='2'/>
     </disk>
     <!--=====================================================================-->
     <!-- VFIO Passthrough GPU                                                -->
@@ -159,13 +173,14 @@
     <!--=====================================================================-->
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
+	<address domain='0x0000' bus='0x0b' slot='0x00' function='0x0'/>
       </source>
+      <rom bar='on' file='/mnt/data/images/vbios/vbios-xfx-rx-560-2-original-amdvbflash.rom'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0' multifunction='on'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x08' slot='0x00' function='0x1'/>
+	<address domain='0x0000' bus='0x0b' slot='0x00' function='0x1'/>
       </source>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x1'/>
     </hostdev> 
@@ -219,5 +234,12 @@
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
+    <!--=====================================================================-->
+    <!-- TPM Device                                                          -->
+    <!-- * Only needed for Windows 11+ Guest VMs.                            -->
+    <!--=====================================================================-->
+    <tpm model='tpm-tis'>
+      <backend type='emulator' version='2.0'/>
+    </tpm>
   </devices>
 </domain>
