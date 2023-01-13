@@ -33,6 +33,7 @@
     <apic/>
   </features>
   <clock offset='utc'>
+    <timer name='kvmclock'/>
     <timer name='rtc' tickpolicy='catchup'/>
     <timer name='pit' tickpolicy='delay'/>
     <timer name='hpet' present='no'/>
@@ -41,12 +42,24 @@
   <!-- CPU and Memory                                                        -->
   <!-- * CPU => A single quad-core processor with same attrs as Host CPU.    -->
   <!-- * Memory => 8GB RAM (fixed, dynamic memory expansion is buggy).       -->
+  <!-- * Guest CPUs are mapped/pinned to specific host CPUs. The mapping is  -->
+  <!--   host-specific. Use 'lscpu -e' to determine the host CPU topology.   -->
+  <!-- * The emulator and IO thread(s) are pinned to dedicated host CPUs.    -->
   <!--=======================================================================-->
   <vcpu placement='static'>4</vcpu>
   <cpu mode='host-model' check='partial'>
     <model fallback='allow'/>
     <topology sockets='1' cores='4' threads='1'/>
   </cpu>
+  <cputune>
+    <vcpupin vcpu='0' cpuset='4'/>
+    <vcpupin vcpu='1' cpuset='5'/>
+    <vcpupin vcpu='2' cpuset='12'/>
+    <vcpupin vcpu='3' cpuset='13'/>
+    <emulatorpin cpuset='0,8'/>
+    <iothreadpin iothread='1' cpuset='0,8'/>
+  </cputune>
+  <iothreads>1</iothreads>
   <memory unit='KiB'>8388608</memory>
   <!--=======================================================================-->
   <!-- Power Management                                                      -->
@@ -136,7 +149,7 @@
     <!--   on the Host must allow access for the libvirt user.               -->
     <!--=====================================================================-->
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <driver name='qemu' type='raw' cache='none' io='native' iothread='1'/>
       <source dev='/dev/mapper/vg0-desktop1'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
