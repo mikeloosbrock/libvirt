@@ -3,7 +3,7 @@
 <!--                                                                         -->
 <!-- Notes:                                                                  -->
 <!-- * This file can be imported into libvirt with: virsh define <file>      -->
-<!-- * Before importing, search/replace desktop1 with your domain name.      -->
+<!-- * Before importing, search/replace 'desktop1' with your domain name.    -->
 <!-- * Before importing, some cfg itmes will likely need to modified.        -->
 <!-- * For example, you probably need to change the bootable DVD/ISO in sda. -->
 <!-- * On import, the XML tags are re-ordered and all comments removed.      -->
@@ -22,7 +22,7 @@
     </libosinfo:libosinfo>
   </metadata>
   <os>
-    <type arch='x86_64' machine='pc-q35-3.1'>hvm</type>
+    <type arch='x86_64' machine='pc-q35-5.2'>hvm</type>
     <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
     <nvram>/var/lib/libvirt/qemu/nvram/desktop1_VARS.fd</nvram>
     <boot dev='cdrom'/>
@@ -157,6 +157,7 @@
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
       <source file='/mnt/data/images/iso/Win11_22H2_English_x64v1.iso'/>
+      <!-- <source file='/mnt/data/images/iso/finnix-124.iso'/> -->
       <readonly/>
       <target dev='sda' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
