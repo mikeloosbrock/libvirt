@@ -18,13 +18,14 @@
   <!--=======================================================================-->
   <metadata>
     <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
+<!--  <libosinfo:os id="http://ubuntu.com/ubuntu/22.04"/> -->
       <libosinfo:os id="http://microsoft.com/win/11"/>
     </libosinfo:libosinfo>
   </metadata>
   <os>
-    <type arch='x86_64' machine='pc-q35-5.2'>hvm</type>
-    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
-    <nvram>/var/lib/libvirt/qemu/nvram/desktop1_VARS.fd</nvram>
+    <type arch='x86_64' machine='q35'>hvm</type>
+    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE_4M.fd</loader>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/desktop1_VARS.fd</nvram>
     <boot dev='cdrom'/>
     <boot dev='hd'/>
   </os>
@@ -49,18 +50,18 @@
   <vcpu placement='static'>4</vcpu>
   <cpu mode='host-model' check='partial'>
     <model fallback='allow'/>
-    <topology sockets='1' cores='4' threads='1'/>
+    <topology sockets='1' cores='2' threads='2'/>
   </cpu>
   <cputune>
     <vcpupin vcpu='0' cpuset='4'/>
     <vcpupin vcpu='1' cpuset='5'/>
-    <vcpupin vcpu='2' cpuset='12'/>
-    <vcpupin vcpu='3' cpuset='13'/>
-    <emulatorpin cpuset='0,8'/>
-    <iothreadpin iothread='1' cpuset='0,8'/>
+    <vcpupin vcpu='2' cpuset='11'/>
+    <vcpupin vcpu='3' cpuset='12'/>
+    <emulatorpin cpuset='8'/>
+    <iothreadpin iothread='1' cpuset='8'/>
   </cputune>
   <iothreads>1</iothreads>
-  <memory unit='KiB'>8388608</memory>
+  <memory unit='KiB'>12582912</memory>
   <!--=======================================================================-->
   <!-- Power Management                                                      -->
   <!--=======================================================================-->
@@ -110,7 +111,8 @@
     </controller>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-	<address domain='0x0000' bus='0x05' slot='0x00' function='0x0' />
+        <!-- USB controller [0c03]: Renesas Technology Corp. uPD720201 USB 3.0 Host Controller [1912:0014] -->
+        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0' />
       </source>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
     </hostdev>
@@ -156,8 +158,9 @@
     </disk>
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
+<!--  <source file='/mnt/data/images/iso/finnix-124.iso'/> -->
+<!--  <source file='/mnt/data/images/iso/ubuntu-22.04.3-desktop-amd64.iso'/> -->
       <source file='/mnt/data/images/iso/Win11_22H2_English_x64v1.iso'/>
-      <!-- <source file='/mnt/data/images/iso/finnix-124.iso'/> -->
       <readonly/>
       <target dev='sda' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='0'/>
@@ -186,18 +189,26 @@
     <!--   <address> tags and follow the PCI topology scheme outlined above. -->
     <!--=====================================================================-->
     <hostdev mode='subsystem' type='pci' managed='yes'>
-      <source>
-	<address domain='0x0000' bus='0x0b' slot='0x00' function='0x0'/>
-      </source>
-      <rom bar='on' file='/mnt/data/images/vbios/vbios-xfx-rx-560-2-original-amdvbflash.rom'/>
+      <!-- The virtual guest-side PCI address we want to be assigned. -->
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0' multifunction='on'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <!-- The real host-side PCI address obtained from lspci. -->
       <source>
-	<address domain='0x0000' bus='0x0b' slot='0x00' function='0x1'/>
+        <!-- VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin [Radeon RX 460/560D / Pro 450/455/460/555/555X/560/560X] [1002:67ef] -->
+	      <address domain='0x0000' bus='0x0b' slot='0x00' function='0x0'/>
       </source>
+      <rom bar='on' file='/mnt/data/images/vbios/vbios-1002:67ef-1682:956d-xfx-radeon-rx-560-amdvbflash.rom'/>
+    </hostdev>
+    <!--=====================================================================-->
+    <!-- Audio function of the above GPU.                                    -->
+    <!--=====================================================================-->
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <!-- The virtual guest-side PCI address we want to be assigned. Must be the same as the GPU, but with an incremented function. -->
       <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x1'/>
-    </hostdev> 
+      <!-- The real host-side PCI address obtained from lspci. Must be the same as the GPU, but with an incremented function. -->
+      <source>
+	      <address domain='0x0000' bus='0x0b' slot='0x00' function='0x1'/>
+      </source>
+    </hostdev>
     <!--=====================================================================-->
     <!-- Emulated GPU                                                        -->
     <!-- * For remote, low-performance graphical interaction with the guest. -->
@@ -209,13 +220,14 @@
     <!-- * To promote this GPU to primary/boot, change its PCI slot from 7   -->
     <!--   to 5, giving it priority over the VFIO Passthrough GPU in slot 6. -->
     <!--=====================================================================-->
-    <video>
-      <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
-    </video>
-    <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0' sharePolicy='allow-exclusive'>
-      <listen type='address' address='0.0.0.0'/>
-    </graphics>
+    <!-- Not used since newer QEMU versions seem to make this the primary GPU no matter what.          -->
+    <!-- <video>                                                                                       -->
+    <!--   <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='no'/>          -->
+    <!--   <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>                 -->
+    <!-- </video>                                                                                      -->
+    <!-- <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0' sharePolicy='allow-exclusive'> -->
+    <!--   <listen type='address' address='0.0.0.0'/>                                                  -->
+    <!-- </graphics>                                                                                   -->
     <!--=====================================================================-->
     <!-- USB Devices                                                         -->
     <!-- * Specific real devices are plugged into the Host and passed thru.  -->
